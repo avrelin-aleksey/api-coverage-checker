@@ -1,0 +1,63 @@
+[build-system]
+requires = ["setuptools", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "api-coverage-checker"
+version = "0.1.0"
+description = "Local-first OpenAPI contract coverage for API test suites"
+readme = { file = "README.md", content-type = "text/markdown" }
+license = { file = "LICENSE" }
+authors = [
+    { name = "Avrelin Aleksei", email = "alex0307201@yandex.ru" }
+]
+keywords = ["openapi", "coverage", "testing", "api"]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "License :: OSI Approved :: Apache Software License",
+    "Operating System :: OS Independent",
+    "Intended Audience :: Developers",
+    "Topic :: Software Development :: Testing",
+    "Topic :: Software Development :: Quality Assurance",
+]
+requires-python = ">=3.11"
+dependencies = [
+    "click",
+    "httpx",
+    "pyyaml",
+    "requests",
+]
+
+[project.urls]
+Homepage = "https://github.com/avrelin-aleksey/api-coverage-checker"
+Repository = "https://github.com/avrelin-aleksey/api-coverage-checker"
+
+[project.scripts]
+acc = "api_coverage_checker.cli:command_line"
+
+[project.optional-dependencies]
+test = ["pytest", "pytest-cov"]
+
+[tool.setuptools]
+include-package-data = true
+
+[tool.setuptools.packages.find]
+where = ["src"]
+include = ["api_coverage_checker*"]
+
+[tool.setuptools.package-data]
+"api_coverage_checker.dashboard" = ["page.html"]
+
+[tool.pytest.ini_options]
+pythonpath = ["src"]
+testpaths = ["tests"]
+
+[tool.ruff]
+line-length = 120
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "W"]
+ignore = ["E501"]

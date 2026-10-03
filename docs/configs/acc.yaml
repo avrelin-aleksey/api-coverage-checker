@@ -1,0 +1,13 @@
+apis:
+  - key: shop
+    title: Shop API
+    spec_url: https://example.com/openapi.json
+    skip:
+      - path: /health
+      - method: OPTIONS
+journal_dir: ./acc-journal
+page_path: ./acc-output/index.html
+data_path: ./acc-output/report.json
+history_path: ./acc-output/history.json
+history_limit: 90
+minimum_score: 80
