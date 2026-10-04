@@ -8,7 +8,7 @@ from __future__ import annotations
 import json
 import logging
 from copy import deepcopy
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from importlib.resources import files
 from pathlib import Path
 
@@ -97,7 +97,7 @@ def compose(config: RuntimeConfig) -> dict:
         if stored.get("score") is not None:
             board["history"] = list(stored.get("score") or [])
     report = {
-        "generated_at": datetime.now(timezone.utc).isoformat(),
+        "generated_at": datetime.now(UTC).isoformat(),
         "created_by": "Avrelin Aleksei",
         "catalog": [{"key": api.key, "title": api.title} for api in config.apis],
         "boards": boards,

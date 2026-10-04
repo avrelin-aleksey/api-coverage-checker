@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "api-coverage-checker"
-version = "0.1.0"
+version = "1.35.7"
 description = "Local-first OpenAPI contract coverage for API test suites"
 readme = { file = "README.md", content-type = "text/markdown" }
 license = { file = "LICENSE" }
@@ -53,11 +53,25 @@ include = ["api_coverage_checker*"]
 [tool.pytest.ini_options]
 pythonpath = ["src"]
 testpaths = ["tests"]
+addopts = "--cov=api_coverage_checker --cov-fail-under=95"
+
+[tool.coverage.run]
+omit = [
+    "*/models.py",
+]
+
+[tool.coverage.report]
+exclude_lines = [
+    "pragma: no cover",
+    "if TYPE_CHECKING:",
+]
 
 [tool.ruff]
 line-length = 120
 target-version = "py311"
 
 [tool.ruff.lint]
-select = ["E", "F", "I", "W"]
+select = ["E", "F", "I", "W", "UP", "B"]
 ignore = ["E501"]
+
+

@@ -1,11 +1,12 @@
 {
   "name": "api-coverage-checker-report",
   "private": true,
-  "version": "0.1.0",
+  "version": "1.35.7",
   "type": "module",
   "scripts": {
     "dev": "vite",
     "build": "vite build && node ./scripts/copy-template.mjs",
+    "test": "node --experimental-strip-types --test scripts/*.test.mjs",
     "test:history": "node --experimental-strip-types --test scripts/history.test.mjs",
     "preview": "vite preview"
   },

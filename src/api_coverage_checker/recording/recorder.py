@@ -19,20 +19,31 @@ logger = logging.getLogger("acc.recorder")
 
 
 def _snapshot(service: str, template: str, response: Any) -> dict:
-    request = response.request
-    location = urlsplit(str(getattr(request, "url", "")))
+    request = getattr(response, "request", None)
+    if request is not None:
+        url_str = str(getattr(request, "url", ""))
+        verb = str(getattr(request, "method", "GET")).upper()
+        request_body = getattr(request, "content", None)
+        if request_body is None:
+            request_body = getattr(request, "body", None)
+    else:
+        url_str = ""
+        verb = "GET"
+        request_body = None
+
+    location = urlsplit(url_str)
     query = sorted({name for name, _value in parse_qsl(location.query, keep_blank_values=True)})
-    request_body = getattr(request, "content", None)
-    if request_body is None:
-        request_body = getattr(request, "body", None)
+    status_code = int(getattr(response, "status_code", 200))
+    saw_response = bool(getattr(response, "content", getattr(response, "text", b"")))
+
     return {
         "service": service,
         "template": template,
-        "verb": str(getattr(request, "method", "GET")).upper(),
-        "status": int(response.status_code),
+        "verb": verb,
+        "status": status_code,
         "query": query,
         "saw_request": bool(request_body),
-        "saw_response": bool(getattr(response, "content", b"")),
+        "saw_response": saw_response,
         "path": location.path or template,
     }
 

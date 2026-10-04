@@ -9,7 +9,7 @@ import json
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any
-from urllib.request import urlopen
+from urllib.request import Request, urlopen
 
 import yaml
 
@@ -38,9 +38,10 @@ def _parse_text(text: str) -> dict[str, Any]:
     return loaded
 
 
-def fetch_document(spec_url: str | None, spec_file: str | None) -> dict[str, Any]:
+def fetch_document(spec_url: str | None, spec_file: str | None, headers: dict[str, str] | None = None) -> dict[str, Any]:
     if spec_url:
-        with urlopen(spec_url, timeout=30) as response:  # noqa: S310
+        req = Request(spec_url, headers=headers or {})
+        with urlopen(req, timeout=30) as response:  # noqa: S310
             payload = response.read().decode("utf-8")
         return _parse_text(payload)
     if spec_file:
@@ -55,9 +56,16 @@ def _lookup(root: dict[str, Any], pointer: str) -> Any:
     cursor: Any = root
     for token in pointer[2:].split("/"):
         token = token.replace("~1", "/").replace("~0", "~")
-        if not isinstance(cursor, dict) or token not in cursor:
+        if isinstance(cursor, dict) and token in cursor:
+            cursor = cursor[token]
+        elif isinstance(cursor, list) and token.isdigit():
+            idx = int(token)
+            if 0 <= idx < len(cursor):
+                cursor = cursor[idx]
+            else:
+                return None
+        else:
             return None
-        cursor = cursor[token]
     return cursor
 
 

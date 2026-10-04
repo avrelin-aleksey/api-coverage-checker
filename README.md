@@ -178,6 +178,55 @@ To ignore all methods of one path, write only `path`. To ignore several methods 
 
 The ignored block shows which rule matched and the YAML to delete. Remove that rule from `acc.yaml` and run `acc report` again to put the operation back into the percentage.
 
+## CI/CD Integration & Pytest Fixture
+
+### Pytest Fixture Example
+
+```python
+import pytest
+import httpx
+from api_coverage_checker import ApiRecorder
+
+@pytest.fixture(scope="session")
+def api_recorder():
+    return ApiRecorder("shop")
+
+@pytest.fixture
+def recorded_client(api_recorder):
+    client = httpx.Client(base_url="http://localhost:8000")
+    # Wrap endpoints under coverage tracking
+    client.get = api_recorder.httpx("/users/{user_id}")(client.get)
+    return client
+```
+
+### GitHub Actions Workflow Example
+
+```yaml
+name: API Coverage CI
+
+on: [push, pull_request]
+
+jobs:
+  test-coverage:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install dependencies
+        run: |
+          pip install -e .
+          pip install pytest httpx
+      - name: Run test suite
+        run: pytest
+      - name: Validate OpenAPI spec
+        run: acc validate
+      - name: Generate Coverage Report
+        run: acc report --fail-under 80 --format junit > acc-junit.xml
+```
+
 ## Docs
 
 - [English](docs/en/guide.md)
